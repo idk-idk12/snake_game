@@ -1,2 +1,2 @@
-# snake_game
+# Terminal Snake Game
 Simple terminal snake game
