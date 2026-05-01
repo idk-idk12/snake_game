@@ -24,13 +24,22 @@ bool find_(int currX, int currY) {
     return false;
 }
 
-bool check_if_snake_ate_itself() {
+bool ate_itself() {
     for (int i = 1; i < tailX.size(); i++) {
         if (tailX.at(0) == tailX.at(i) && tailY.at(0) == tailY.at(i)) {
             return true;
         }
     }
     return false;
+}
+
+bool out_of_bounds() {
+    if (tailX.at(0) < 0 || tailX.at(0) > width-1 || tailY.at(0) < 0 || tailY.at(0) > height-1) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 void Setup() {
@@ -52,7 +61,10 @@ void Setup() {
 }
 
 void Draw() {
-    system("cls");
+    // system("cls");
+    // Instead of system("cls");, I reset the cursor position back to the initial position of (0,0). This was because system("cls") was causing there to be a flickering effect due to it clearing the screen for a split second.
+    COORD coord = {0, 0};
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 
     std::cout << "#";
     for (x = 0; x < width; x++) {
@@ -146,13 +158,21 @@ void Logic() {
             break;
     }
 
-    if (tailX.at(0) < 0 || tailX.at(0) > width-1 || tailY.at(0) < 0 || tailY.at(0) > height-1 || check_if_snake_ate_itself()) {
+    if (out_of_bounds() || ate_itself()) {
         gameOver = true;
     }
 }
 
 int main() {
     Setup();
+
+    system("cls");
+    // Make the cursor invisible
+    CONSOLE_CURSOR_INFO	cursor_info;
+    GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor_info);
+    cursor_info.bVisible = false;
+    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor_info);
+
     while (!gameOver) {
         Draw();
         Input();
@@ -161,5 +181,9 @@ int main() {
     }
     system("cls");
     std::cout << "GAME OVER!\nFinal Score: " << score << std::endl;
+
+    // Make the cursor visible again
+    cursor_info.bVisible = true;
+    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor_info);
     return 0;
 }
